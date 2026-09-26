@@ -141,7 +141,8 @@ if (calc) (function(){
     if (type === "flat") return a < 35 ? 60000 : (a <= 100 ? 55000 : null);
     return a <= 80 ? 35000 : 30000;                    /* до 30 м² ставка не названа - берём 35 000 */
   }
-  var ROOF = {pc:{f:"#F0A23A", o:.62, s:"#C9771C"}, pl:{f:"#5B636C", o:1, s:"#3A4047"}, mt:{f:"#7A2E22", o:1, s:"#4E1B14"}};
+  var ROOF = {pl:{f:"#5B636C", o:1, s:"#3A4047"}, mt:{f:"#7A2E22", o:1, s:"#4E1B14"}};
+  function pickOn(sel, v){ calc.querySelectorAll(sel + " button").forEach(function(x){ var o = x.getAttribute("data-v") === v; x.classList.toggle("is-on", o); x.setAttribute("aria-checked", o ? "true" : "false"); }); }
   function on(sel){ var b = calc.querySelector(sel + " .is-on"); return b ? b.getAttribute("data-v") : ""; }
   function lbl(sel){ var b = calc.querySelector(sel + " .is-on"); return b ? b.textContent.trim() : ""; }
   function num(v){ var s = String(Math.round(v * 10) / 10); return curLang() === "en" ? s : s.replace(".", ","); }
@@ -155,14 +156,22 @@ if (calc) (function(){
       if (type === "arch") y = H + W * .24 * Math.sin(Math.PI * t);
       else if (type === "mono") y = H + W * .14 * (1 - t);
       else if (type === "gable") y = H + W * .24 * (1 - Math.abs(2 * t - 1));
-      else if (type === "semi") y = H + W * .3 * Math.cos(t * Math.PI / 2) * (1 - .25 * t);
       else y = H + .32;
       pts.push([x, y]);
     }
     return pts;
   }
   function draw(){
-    var W = +iW.value, L = +iL.value, H = +iH.value, type = on(".ctype"), roof = ROOF[on('[data-k="roof"]')] || ROOF.pc;
+    var W = +iW.value, L = +iL.value, H = +iH.value, type = on(".ctype");
+    /* профилированный поликарбонат не гнётся: для арочного только сотовый или профлист */
+    var bend = type === "arch";
+    ["ppc", "mt"].forEach(function(v){ calc.querySelector('[data-k="roof"] [data-v="' + v + '"]').disabled = bend; });
+    if (bend && /^(ppc|mt)$/.test(on('[data-k="roof"]'))) pickOn('[data-k="roof"]', "pc");
+    var rk = on('[data-k="roof"]'), pcol = on('[data-k="pcol"]') || "#6B4226";
+    calc.classList.toggle("is-flat", type === "flat");
+    calc.classList.toggle("is-bend", bend);
+    calc.classList.toggle("no-pcol", rk === "pl" || rk === "mt");
+    var roof = ROOF[rk] || {f:pcol, o: pcol === "#DDE8EE" ? .45 : .7, s:pcol};
     var col = on('[data-k="col"]') || "#4A2E22";
     var ex = {}; calc.querySelectorAll(".cchk input").forEach(function(c){ ex[c.value] = c.checked; });
     if (type === "flat") roof = {f:col, o:1, s:col};
@@ -241,6 +250,7 @@ if (calc) (function(){
     var cityB = calc.querySelector(".cat-city .is-active"), city = cityB ? cityB.getAttribute("data-city") : "ast";
     var area = Math.round(W * L * 100) / 100, r = rate(city, type, area), pv = document.getElementById("o-price");
     var pk = pack(), dk = pk ? pk.dict : {}, TT = function(k){ return pick(k, dk) || CALC_RU[k] || ""; };
+    if (r && type !== "flat" && rk === "mt") r += 3000;          /* металлочерепица: +3 000 ₸/м² к базе */
     var priceTxt = "";
     if (r) {
       priceTxt = fmtPrice(Math.round(area * r)) + " ₸";
@@ -259,7 +269,7 @@ if (calc) (function(){
       T("nc.city") + ": " + (cb ? cb.textContent.trim() : "") + "\n" +
       T("nc.type") + ": " + lbl(".ctype") + "\n" +
       T("nc.size") + ": " + num(W) + " × " + num(L) + " " + mu + " (" + num(W * L) + " " + mu + "²), " + T("nc.h").toLowerCase() + " " + num(H) + " " + mu + "\n" +
-      T("nc.roof") + ": " + lbl('[data-k="roof"]') + "\n" +
+      T("nc.roof") + ": " + (type === "flat" ? T("nc.flat") : lbl('[data-k="roof"]') + (rk === "pl" || rk === "mt" ? "" : ", " + lbl('[data-k="pcol"]').toLowerCase())) + "\n" +
       T("nc.col") + ": " + lbl('[data-k="col"]') +
       (extra.length ? "\n" + T("nc.ext") + ": " + extra.join(", ") : "") +
       (priceTxt ? "\n" + T("nc.pr") + ": " + priceTxt : "");

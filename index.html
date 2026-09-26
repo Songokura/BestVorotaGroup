@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@600;800&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/video/gate-auto-loop.webp">
-<link rel="stylesheet" href="styles.css?v=20260926-4">
+<link rel="stylesheet" href="styles.css?v=20260926-5">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"LocalBusiness","@id":"https://songokura.github.io/BestVorotaGroup/#astana","name":"Best Vorota Group - Астана","description":"Изготовление и установка ворот, навесов, заборов, перил и металлоконструкций под ключ в Астане. Откатные, распашные, кованые и автоматические ворота, навесы хай-тек.","url":"https://songokura.github.io/BestVorotaGroup/","telephone":"+77019980007","email":"Nurlybek.vorota@gmail.com","image":"https://songokura.github.io/BestVorotaGroup/assets/og-image.jpg","priceRange":"₸₸","foundingDate":"2017","address":{"@type":"PostalAddress","streetAddress":"ул. Акжол, 33","addressLocality":"Астана","addressCountry":"KZ"},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"19:00"},"sameAs":["https://www.instagram.com/best_vorota_astana/"],"areaServed":{"@type":"City","name":"Астана"}},
@@ -221,7 +221,7 @@
     <div class="head rv">
       <p class="kicker" data-i="nc.k">Калькулятор навеса</p>
       <h2 data-i="nc.t">Соберите свой навес - расчёт пришлём в WhatsApp</h2>
-      <p class="lead" data-i="nc.l">Выберите форму, размеры и кровлю. Менеджер посчитает стоимость по прайсу вашего города и ответит в WhatsApp.</p>
+      <p class="lead" data-i="nc.l">Укажите примерные размеры - сориентируем по цене. Если цена устроит, мастер или менеджер приедет на участок и сделает точный замер.</p>
     </div>
     <div class="calc rv">
       <div class="calc-f">
@@ -238,7 +238,6 @@
             <button type="button" role="radio" data-v="arch" aria-checked="true" class="is-on"><svg viewBox="0 0 60 30"><path d="M4 28V14Q30-6 56 14v14"/></svg><span data-i="nc.t1">Арочный</span></button>
             <button type="button" role="radio" data-v="mono" aria-checked="false"><svg viewBox="0 0 60 30"><path d="M4 28V8l52 8v12"/></svg><span data-i="nc.t2">Односкатный</span></button>
             <button type="button" role="radio" data-v="gable" aria-checked="false"><svg viewBox="0 0 60 30"><path d="M4 28V14L30 3l26 11v14"/></svg><span data-i="nc.t3">Двускатный</span></button>
-            <button type="button" role="radio" data-v="semi" aria-checked="false"><svg viewBox="0 0 60 30"><path d="M4 28V6Q40 4 56 16v12"/></svg><span data-i="nc.t4">Полуарочный</span></button>
             <button type="button" role="radio" data-v="flat" aria-checked="false"><svg viewBox="0 0 60 30"><path d="M4 28V8h52v20M4 12h52"/></svg><span data-i="nc.t5">Хай-тек</span></button>
           </div>
         </div>
@@ -246,14 +245,32 @@
           <label class="rng"><span><b data-i="nc.w">Ширина</b> <output id="o-w">4</output> <i data-i="nc.m">м</i></span><input type="range" id="c-w" min="2" max="12" step="0.5" value="4"></label>
           <label class="rng"><span><b data-i="nc.len">Длина</b> <output id="o-l">6</output> <i data-i="nc.m">м</i></span><input type="range" id="c-l" min="2" max="24" step="0.5" value="6"></label>
           <label class="rng"><span><b data-i="nc.h">Высота столбов</b> <output id="o-h">2.5</output> <i data-i="nc.m">м</i></span><input type="range" id="c-h" min="2" max="4" step="0.1" value="2.5"></label>
+          <p class="cf-hint" data-i="nc.hint">Точного размера не знаете - поставьте примерно, этого хватит для ориентира.</p>
         </div>
-        <div class="cf">
+        <div class="cf cf-roof">
           <p class="cf-l" data-i="nc.roof">Кровля</p>
           <div class="cseg" data-k="roof" role="radiogroup" aria-label="Кровля" data-i-aria="nc.roof">
-            <button type="button" role="radio" data-v="pc" aria-checked="true" class="is-on" data-i="nc.r1">Поликарбонат</button>
-            <button type="button" role="radio" data-v="pl" aria-checked="false" data-i="nc.r2">Профлист</button>
-            <button type="button" role="radio" data-v="mt" aria-checked="false" data-i="nc.r3">Металлочерепица</button>
+            <button type="button" role="radio" data-v="pc" aria-checked="true" class="is-on" data-i="nc.r1">Сотовый поликарбонат 8 мм</button>
+            <button type="button" role="radio" data-v="ppc" aria-checked="false" data-i="nc.r4">Профилированный поликарбонат 6-8 мм</button>
+            <button type="button" role="radio" data-v="pl" aria-checked="false" data-i="nc.r2">Профлист 0,45 мм</button>
+            <button type="button" role="radio" data-v="mt" aria-checked="false" data-i="nc.r3">Металлочерепица +3 000 ₸/м²</button>
           </div>
+          <p class="cf-hint" id="ppc-note" data-i="nc.ppc">Профилированный поликарбонат и металлочерепица не гнутся - только для односкатных и двускатных навесов.</p>
+        </div>
+        <div class="cf cf-pcol">
+          <p class="cf-l" data-i="nc.pcol">Цвет поликарбоната</p>
+          <div class="cseg cols" data-k="pcol" role="radiogroup" aria-label="Цвет поликарбоната" data-i-aria="nc.pcol">
+            <button type="button" role="radio" data-v="#6B4226" aria-checked="true" class="is-on"><i style="background:#6B4226"></i><span data-i="nc.p6">Шоколадный</span></button>
+            <button type="button" role="radio" data-v="#5E646B" aria-checked="false"><i style="background:#5E646B"></i><span data-i="nc.p1">Графит</span></button>
+            <button type="button" role="radio" data-v="#DDE8EE" aria-checked="false"><i style="background:#DDE8EE"></i><span data-i="nc.p2">Прозрачный</span></button>
+            <button type="button" role="radio" data-v="#3E8A5A" aria-checked="false"><i style="background:#3E8A5A"></i><span data-i="nc.p3">Зелёный</span></button>
+            <button type="button" role="radio" data-v="#2F66A8" aria-checked="false"><i style="background:#2F66A8"></i><span data-i="nc.p4">Синий</span></button>
+            <button type="button" role="radio" data-v="#7A1F2B" aria-checked="false"><i style="background:#7A1F2B"></i><span data-i="nc.p5">Гранатовый</span></button>
+          </div>
+        </div>
+        <div class="cf cf-flat">
+          <p class="cf-l" data-i="nc.roof">Кровля</p>
+          <p class="cf-flat-t" data-i="nc.flat">Хай-тек: металлическая обшивка снаружи и изнутри, водосток скрыт внутри.</p>
         </div>
         <div class="cf">
           <p class="cf-l" data-i="nc.col">Цвет каркаса</p>
@@ -285,10 +302,21 @@
           <p class="cv-pv"><output id="o-price">840 000</output> <span id="o-cur">₸</span></p>
           <p class="cv-rate" id="o-rate"></p>
         </div>
-        <p class="cv-note" data-i="nc.note">Ориентир по ставке за м² для вашего города. Опции и точную сумму менеджер уточнит и пришлёт в WhatsApp. Замер бесплатно.</p>
+        <p class="cv-note" data-i="nc.note">Ориентир по ставке за м² для вашего города. Точную сумму назовём после замера на участке - замер бесплатно.</p>
         <a class="btn btn-wa cv-go" id="calc-go" href="https://wa.me/77009517425" target="_blank" rel="noopener"><svg width="18" height="18"><use href="#ic-wa"/></svg><span data-i="nc.go">Получить расчёт в WhatsApp</span></a>
       </div>
     </div>
+    <details class="spec rv">
+      <summary><span data-i="sp.t">Стандартная комплектация навеса</span><svg width="16" height="16" style="fill:none"><use href="#ic-arr"/></svg></summary>
+      <ul>
+        <li><b data-i="sp.1t">Стойки</b><span data-i="sp.1">профтруба 80×80 мм, стенка 2 или 3 мм</span></li>
+        <li><b data-i="sp.2t">Фермы</b><span data-i="sp.2">профтруба 40×20 или 40×40 мм, стенка 1,5 или 2 мм</span></li>
+        <li><b data-i="sp.3t">Прогоны</b><span data-i="sp.3">профтруба 40×20 мм, стенка 1,5 мм</span></li>
+        <li><b data-i="sp.4t">Несущие балки</b><span data-i="sp.4">профтруба 80×80 мм или составная балка из профтрубы 40×40×1,5 мм</span></li>
+        <li><b data-i="sp.5t">Кровля в базовой цене</b><span data-i="sp.5">профлист 0,45 мм или сотовый поликарбонат 8 мм; металлочерепица +3 000 ₸/м²</span></li>
+      </ul>
+      <p data-i="sp.n">Это стандартная комплектация. Под размер, пролёт и нагрузку сечение трубы и толщину металла подбираем индивидуально.</p>
+    </details>
   </div>
   <div class="lane-w" id="navesy-raboty">
     <div class="wrap lane-head rv">
@@ -559,6 +587,17 @@
   </div>
   <div class="wrap">
     <p class="cat-note rv" data-i="ct.note">Не нашли свою модель? Пришлите фото понравившихся ворот - сделаем такие же или лучше.</p>
+    <details class="spec rv">
+      <summary><span data-i="sg.t">Стандартная комплектация ворот</span><svg width="16" height="16" style="fill:none"><use href="#ic-arr"/></svg></summary>
+      <ul>
+        <li><b data-i="sg.1t">Проём</b><span data-i="sg.1">ширина до 4 м, высота 2,0-2,2 м - базовый размер для стандартного изготовления</span></li>
+        <li><b data-i="sg.2t">Стойки</b><span data-i="sg.2">профтруба 100×100 мм, стенка 3 мм</span></li>
+        <li><b data-i="sg.3t">Каркас створок</b><span data-i="sg.3">профтруба 40×40 или 60×40 мм, стенка 2 мм - по размеру створки и заполнению</span></li>
+        <li><b data-i="sg.4t">Заполнение</b><span data-i="sg.4">профтруба 40×20, 25×25 или 20×20 мм - по эскизу</span></li>
+        <li><b data-i="sg.5t">Листовое заполнение</b><span data-i="sg.5">горячекатаный лист 1,5 мм</span></li>
+      </ul>
+      <p data-i="sg.n">Проём шире или выше, тяжёлое заполнение, автоматика или нестандартный дизайн - конструкцию рассчитываем индивидуально и при необходимости усиливаем металл.</p>
+    </details>
   </div>
 </section>
 
@@ -763,6 +802,6 @@
   <video id="modalV" controls playsinline preload="none"></video>
 </div>
 
-<script src="script.js?v=20260926-4" defer></script>
+<script src="script.js?v=20260926-5" defer></script>
 </body>
 </html>
