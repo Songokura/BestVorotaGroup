@@ -76,7 +76,7 @@ window.SITE_EN = {
     "c.from": "from", "c.more": "Get a price",
     "g.otk-01": "Laser pattern", "g.otk-02": "Rhombus and forging", "g.otk-03": "Vertical", "g.otk-04": "Medallions", "g.otk-05": "Pyramids", "g.otk-06": "Spears",
     "g.otk-07": "Perforation", "g.otk-09": "Horizontal", "g.otk-10": "Wood look", "g.otk-11": "Meander", "g.otk-13": "Chocolate", "g.otk-16": "Crown",
-    "g.ras-01": "Spears and medallions", "g.ras-04": "Arch and rings", "g.ras-08": "Classic arch", "g.ras-10": "Rhombus and monogram", "g.ras-11": "Quilted rhombus",
+    "g.ras-01": "Spears and medallions", "g.ras-09": "Emerald", "g.ras-04": "Arch and rings", "g.ras-08": "Classic arch", "g.ras-10": "Rhombus and monogram", "g.ras-11": "Quilted rhombus",
     "g.ras-13": "Hi-tech", "g.ras-14": "Golden squares", "g.ras-17": "Bordeaux", "g.ras-24": "Pyramids and forging", "g.ras-25": "Lions",
     "g.ras-28": "Wood and metal", "g.ras-29": "Laser cut", "g.ras-30": "Wrought iron", "g.ras-33": "Premium arch",
     "ct.note": "Can't find your model? Send us a photo of gates you like - we will make the same or better.",

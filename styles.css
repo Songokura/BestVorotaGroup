@@ -237,8 +237,6 @@ html[lang="kk"] .h1 span{line-height:1.02}
 .pp .cta2 .btn{margin-top:0}
 .pp .leaf{height:100%;aspect-ratio:9/16;max-height:100%;justify-self:end;
   transform:translateY(calc(30px * (1 - var(--enter)))) scale(calc(.97 + .03 * var(--enter)))}
-/* широкая створка: ширину задаём явно - от aspect-ratio с height:100% Safari раздувал колонку и сжимал текст до слова */
-.pp .leaf.wide{height:auto;aspect-ratio:4/3;width:min(46vw,calc((100svh - var(--hh) - 42px) * 4 / 3));max-height:100%;max-width:none}
 .pp .leaf.duo{aspect-ratio:auto;width:min(46vw,620px);display:grid;grid-template-columns:1fr 1fr;gap:7px;background:#2A2E35}
 .pp .leaf.duo .cell{position:relative;overflow:hidden;background:#0E1013}
 html.no-plate .pp .leaf{height:62svh;min-height:360px}
@@ -254,10 +252,9 @@ html.no-plate .pp .leaf{height:62svh;min-height:360px}
   .pp .btn{margin-top:14px;height:50px}
   .pp .cta2{margin-top:14px}
   .pp .cta2 .btn{margin-top:0;flex:1 1 auto;padding:0 18px}
-  .pp .leaf,.pp .leaf.wide,.pp .leaf.duo{position:absolute;inset:0;height:auto;width:auto;max-width:none;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none;transform:none;justify-self:auto}
+  .pp .leaf,.pp .leaf.duo{position:absolute;inset:0;height:auto;width:auto;max-width:none;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none;transform:none;justify-self:auto}
   .pp .leaf.duo{display:grid;grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:4px}
   .pp .leaf .leaf-shade{background:linear-gradient(180deg,rgba(10,11,13,.35) 0%,rgba(10,11,13,.05) 25%,rgba(10,11,13,.3) 45%,rgba(10,11,13,.9) 72%,rgba(10,11,13,.96) 100%)}
-  .pp .leaf.wide .row img{object-position:50% 50%}
   html.no-plate .pp .leaf{height:auto;min-height:0}
 }
 @media(max-height:700px) and (min-width:761px){.pp .lead{display:none}.chips{margin-top:12px}.pp .btn{margin-top:12px;height:48px}}
