@@ -86,11 +86,38 @@ function setWaLinks(){
     if (t.indexOf("{m}") > -1) {
       var box = a.closest(".gc"), h = box ? box.querySelector("h4 span") : null;
       var m = (a.dataset.m || "") + (h ? " «" + h.textContent.trim() + "»" : "");
+      var cb = document.querySelector(".cat-city button.is-active");
+      if (cb) m += ", " + cb.textContent.trim();          /* каталог какого города смотрел человек */
       t = t.replace("{m}", m);
     }
     a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(t);
     a.target = "_blank"; a.rel = "noopener";
   });
+}
+
+/* ---------------- ГОРОД КАТАЛОГА ----------------
+   У Астаны и Актобе свои прайсы (разные PDF-каталоги клиента, фото и номера моделей общие).
+   Цены обоих городов лежат в data-ast / data-akt у каждой карточки. ?city=akt в URL сильнее
+   сохранённого выбора - так объявление на Актобе сразу открывает актюбинские цены. */
+function fmtPrice(v){ return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0"); }
+function setCity(city){
+  if (city !== "akt") city = "ast";
+  document.querySelectorAll(".pr[data-" + city + "]").forEach(function(b){ b.textContent = fmtPrice(b.getAttribute("data-" + city)); });
+  document.querySelectorAll(".cat-city button").forEach(function(b){
+    var on = b.getAttribute("data-city") === city;
+    b.classList.toggle("is-active", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  try { localStorage.setItem("bvg-city", city); } catch(e){}
+  setWaLinks();
+}
+document.querySelectorAll(".cat-city button").forEach(function(b){
+  b.addEventListener("click", function(){ setCity(b.getAttribute("data-city")); });
+});
+function initCity(){
+  var url = new URLSearchParams(location.search).get("city"), saved = null;
+  try { saved = localStorage.getItem("bvg-city"); } catch(e){}
+  setCity(url === "akt" || url === "ast" ? url : saved);
 }
 
 function applyLang(lang){
@@ -415,6 +442,7 @@ if (form) form.addEventListener("submit", function(e){
 
 /* ---------------- СТАРТ ---------------- */
 snapshot();
+initCity();
 initLang();
 fillTicker();
 fitText();
