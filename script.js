@@ -93,6 +93,7 @@ function setWaLinks(){
     a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(t);
     a.target = "_blank"; a.rel = "noopener";
   });
+  calcUpdate();
 }
 
 /* ---------------- ГОРОД КАТАЛОГА ----------------
@@ -119,6 +120,141 @@ function initCity(){
   try { saved = localStorage.getItem("bvg-city"); } catch(e){}
   setCity(url === "akt" || url === "ast" ? url : saved);
 }
+
+/* ---------------- КАЛЬКУЛЯТОР НАВЕСА ----------------
+   Клиент выбирает форму, размеры, кровлю, цвет и опции - схема перерисовывается сразу,
+   а все параметры уходят готовым текстом в WhatsApp. Цены за м² по городам клиент ещё
+   не прислал, поэтому стоимость считает менеджер (см. _project/chat-log.md). */
+var calc = document.querySelector(".calc");
+function calcUpdate(){}
+if (calc) (function(){
+  var svg = document.getElementById("cv-svg"), NS = "http://www.w3.org/2000/svg";
+  var iW = document.getElementById("c-w"), iL = document.getElementById("c-l"), iH = document.getElementById("c-h");
+  var CALC_RU = {"nc.wa":"Здравствуйте! Расчёт навеса с сайта Best Vorota Group."};
+  var ROOF = {pc:{f:"#F0A23A", o:.62, s:"#C9771C"}, pl:{f:"#5B636C", o:1, s:"#3A4047"}, mt:{f:"#7A2E22", o:1, s:"#4E1B14"}};
+  function on(sel){ var b = calc.querySelector(sel + " .is-on"); return b ? b.getAttribute("data-v") : ""; }
+  function lbl(sel){ var b = calc.querySelector(sel + " .is-on"); return b ? b.textContent.trim() : ""; }
+  function num(v){ var s = String(Math.round(v * 10) / 10); return curLang() === "en" ? s : s.replace(".", ","); }
+  function el(n, a, p){ var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); (p || svg).appendChild(e); return e; }
+
+  /* верх профиля навеса в сечении: точки [x, y] в метрах, x от 0 до ширины */
+  function profile(type, W, H){
+    var pts = [], i, t, n = 24;
+    for (i = 0; i <= n; i++) {
+      t = i / n; var x = t * W, y;
+      if (type === "arch") y = H + W * .24 * Math.sin(Math.PI * t);
+      else if (type === "mono") y = H + W * .14 * (1 - t);
+      else if (type === "gable") y = H + W * .24 * (1 - Math.abs(2 * t - 1));
+      else if (type === "semi") y = H + W * .3 * Math.cos(t * Math.PI / 2) * (1 - .25 * t);
+      else y = H + .32;
+      pts.push([x, y]);
+    }
+    return pts;
+  }
+  function draw(){
+    var W = +iW.value, L = +iL.value, H = +iH.value, type = on(".ctype"), roof = ROOF[on('[data-k="roof"]')] || ROOF.pc;
+    var col = on('[data-k="col"]') || "#4A2E22";
+    var ex = {}; calc.querySelectorAll(".cchk input").forEach(function(c){ ex[c.value] = c.checked; });
+    if (type === "flat") roof = {f:col, o:1, s:col};
+    var top = profile(type, W, H), maxY = 0; top.forEach(function(p){ if (p[1] > maxY) maxY = p[1]; });
+    /* косоугольная проекция: z (длина) уходит вправо-вверх */
+    var kx = .62, ky = .36;
+    var bw = W + L * kx, bh = maxY + L * ky;
+    var s = Math.min(420 / bw, 240 / bh), ox = 50 + (420 - bw * s) / 2, oy = 290 - (240 - bh * s) / 2 + 4;
+    function P(x, y, z){ return [ox + s * (x + z * kx), oy - s * (y + z * ky)]; }
+    function pts(a){ return a.map(function(p){ return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "); }
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var sw = Math.max(1.6, Math.min(4, s * .09)), frame = {stroke:col, "stroke-width":sw, fill:"none", "stroke-linecap":"round", "stroke-linejoin":"round"};
+    var edge = col === "#E9E7E2" ? "#8C9096" : "none";
+    /* площадка */
+    el("polygon", {points:pts([P(-.4,0,-.4),P(W+.4,0,-.4),P(W+.4,0,L+.4),P(-.4,0,L+.4)]), fill:"#C9C6BF"});
+    el("polygon", {points:pts([P(0,0,0),P(W,0,0),P(W,0,L),P(0,0,L)]), fill:"#B3AFA7"});
+    /* стена дома у левого края */
+    if (ex.wall) el("polygon", {points:pts([P(0,0,-.2),P(0,maxY+.5,-.2),P(0,maxY+.5,L+.2),P(0,0,L+.2)]), fill:"#C98F74", stroke:"#A06A52", "stroke-width":1});
+    /* столбы: шаг не больше 3 м */
+    var nz = Math.max(1, Math.ceil(L / 3)), zs = []; for (var i = 0; i <= nz; i++) zs.push(L * i / nz);
+    function postY(x){ var p = top[x ? top.length - 1 : 0]; return type === "flat" ? H : p[1] - (type === "arch" || type === "gable" ? 0 : 0); }
+    var xs = ex.wall ? [W] : [0, W];
+    zs.slice().reverse().forEach(function(z){
+      xs.forEach(function(x){ var a = P(x, 0, z), b = P(x, postY(x), z); el("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], stroke:col, "stroke-width":sw * 1.5, "stroke-linecap":"round", opacity: z === 0 ? 1 : .8}); });
+    });
+    /* кровля: полосы между соседними точками профиля по всей длине */
+    for (i = top.length - 1; i > 0; i--) {
+      var a = top[i - 1], b = top[i];
+      el("polygon", {points:pts([P(a[0],a[1],0),P(b[0],b[1],0),P(b[0],b[1],L),P(a[0],a[1],L)]), fill:roof.f, "fill-opacity":roof.o, stroke:roof.s, "stroke-width":.4, "stroke-opacity":.5});
+    }
+    if (type === "flat") {
+      el("polygon", {points:pts([P(0,H,0),P(W,H,0),P(W,H+.32,0),P(0,H+.32,0)]), fill:col, stroke:edge, "stroke-width":1});
+      el("polygon", {points:pts([P(W,H,0),P(W,H,L),P(W,H+.32,L),P(W,H+.32,0)]), fill:col, "fill-opacity":.85, stroke:edge, "stroke-width":1});
+    }
+    /* фермы: профиль через каждые ~1,5 м */
+    var nf = Math.max(2, Math.round(L / 1.5));
+    for (i = nf; i >= 0; i--) {
+      var z = L * i / nf, line = top.map(function(p){ return P(p[0], p[1], z); });
+      el("polyline", Object.assign({points:pts(line), opacity: i ? .55 : 1}, frame));
+      if (type !== "flat") el("line", {x1:P(0,postY(0),z)[0], y1:P(0,postY(0),z)[1], x2:P(W,postY(1),z)[0], y2:P(W,postY(1),z)[1], stroke:col, "stroke-width":sw * .7, opacity: i ? .45 : .9});
+    }
+    /* ковка: завитки по передней ферме */
+    if (ex.kov && type !== "flat") {
+      for (i = 1; i < 6; i++) {
+        var t = i / 6, pt = top[Math.round(t * (top.length - 1))], c1 = P(pt[0], (pt[1] + postY(t > .5 ? 1 : 0)) / 2, 0), r = Math.max(4, s * .16);
+        el("path", {d:"M" + (c1[0] - r) + "," + c1[1] + "a" + r + "," + r + " 0 1,1 " + r + "," + r + "a" + (r / 2) + "," + (r / 2) + " 0 1,1 " + (r / 2) + ",-" + (r / 2), fill:"none", stroke:"#D9B35B", "stroke-width":1.6});
+      }
+    }
+    /* водосток по нижней кромке и труба */
+    if (ex.drain) {
+      var gx = W, gy = top[top.length - 1][1];
+      var g1 = P(gx, gy, 0), g2 = P(gx, gy, L), g3 = P(gx, 0, 0);
+      el("line", {x1:g1[0], y1:g1[1], x2:g2[0], y2:g2[1], stroke:"#2F3439", "stroke-width":sw * 1.3});
+      el("line", {x1:g1[0] + 5, y1:g1[1], x2:g3[0] + 5, y2:g3[1], stroke:"#2F3439", "stroke-width":sw});
+    }
+    /* подсветка: тёплые точки под передней балкой */
+    if (ex.light) for (i = 1; i < 6; i++) {
+      var lp = P(W * i / 6, H - .08, L * .15); el("circle", {cx:lp[0], cy:lp[1] + 3, r:3.2, fill:"#FFE6A8"}); el("circle", {cx:lp[0], cy:lp[1] + 3, r:9, fill:"#FFD27A", opacity:.35});
+    }
+    /* размеры */
+    var m = document.querySelector('[data-i="nc.m"]'), mu = m ? m.textContent : "м";
+    function dim(a, b, text, dx, dy){
+      el("line", {x1:a[0] + dx, y1:a[1] + dy, x2:b[0] + dx, y2:b[1] + dy, stroke:"#3C4148", "stroke-width":1, "stroke-dasharray":"4 3"});
+      var tx = el("text", {x:(a[0] + b[0]) / 2 + dx, y:(a[1] + b[1]) / 2 + dy + (dy > 0 ? 14 : -6), "text-anchor":"middle", fill:"#23272C", "font-size":13, "font-weight":700, "font-family":"Golos Text,Segoe UI,sans-serif"}); tx.textContent = text;
+    }
+    dim(P(0,0,0), P(W,0,0), num(W) + " " + mu, 0, 12);
+    dim(P(W,0,0), P(W,0,L), num(L) + " " + mu, 14, 8);
+    var hl = el("text", {x:P(0,H/2,0)[0] - 10, y:P(0,H/2,0)[1], "text-anchor":"end", fill:"#23272C", "font-size":13, "font-weight":700, "font-family":"Golos Text,Segoe UI,sans-serif"}); hl.textContent = "h " + num(H) + " " + mu;
+    /* итог */
+    document.getElementById("o-w").textContent = num(W);
+    document.getElementById("o-l").textContent = num(L);
+    document.getElementById("o-h").textContent = num(H);
+    document.getElementById("o-area").textContent = num(W * L);
+    document.getElementById("o-size").textContent = num(W) + " × " + num(L) + " " + mu;
+    /* текст заявки */
+    var p = pack(), d = p ? p.dict : {}, T = function(k){ return pick(k, d) || CALC_RU[k] || ""; };
+    var cb = calc.querySelector(".cat-city .is-active");
+    var extra = []; calc.querySelectorAll(".cchk input:checked").forEach(function(c){ extra.push(c.nextElementSibling.textContent.trim()); });
+    var msg = T("nc.wa") + "\n" +
+      T("nc.city") + ": " + (cb ? cb.textContent.trim() : "") + "\n" +
+      T("nc.type") + ": " + lbl(".ctype") + "\n" +
+      T("nc.size") + ": " + num(W) + " × " + num(L) + " " + mu + " (" + num(W * L) + " " + mu + "²), " + T("nc.h").toLowerCase() + " " + num(H) + " " + mu + "\n" +
+      T("nc.roof") + ": " + lbl('[data-k="roof"]') + "\n" +
+      T("nc.col") + ": " + lbl('[data-k="col"]') +
+      (extra.length ? "\n" + T("nc.ext") + ": " + extra.join(", ") : "");
+    var go = document.getElementById("calc-go");
+    go.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+  }
+  calcUpdate = draw;
+  function radio(group){
+    group.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        group.querySelectorAll("button").forEach(function(x){ var o = x === b; x.classList.toggle("is-on", o); x.setAttribute("aria-checked", o ? "true" : "false"); });
+        draw();
+      });
+    });
+  }
+  calc.querySelectorAll(".ctype,.cseg").forEach(radio);
+  [iW, iL, iH].forEach(function(i){ i.addEventListener("input", draw); });
+  calc.querySelectorAll(".cchk input").forEach(function(c){ c.addEventListener("change", draw); });
+  draw();
+})();
 
 function applyLang(lang){
   var d = LANGS[lang] ? LANGS[lang].dict : null;
