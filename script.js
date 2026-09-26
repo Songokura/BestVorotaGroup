@@ -123,14 +123,24 @@ function initCity(){
 
 /* ---------------- КАЛЬКУЛЯТОР НАВЕСА ----------------
    Клиент выбирает форму, размеры, кровлю, цвет и опции - схема перерисовывается сразу,
-   а все параметры уходят готовым текстом в WhatsApp. Цены за м² по городам клиент ещё
-   не прислал, поэтому стоимость считает менеджер (см. _project/chat-log.md). */
+   а все параметры уходят готовым текстом в WhatsApp. Ориентир цены - по ставкам клиента
+   за м² (26.09.2026): своя сетка у Астаны и у Актобе, у хай-тека - отдельная. Где ставки нет -
+   «рассчитает менеджер». */
 var calc = document.querySelector(".calc");
 function calcUpdate(){}
 if (calc) (function(){
   var svg = document.getElementById("cv-svg"), NS = "http://www.w3.org/2000/svg";
   var iW = document.getElementById("c-w"), iL = document.getElementById("c-l"), iH = document.getElementById("c-h");
-  var CALC_RU = {"nc.wa":"Здравствуйте! Расчёт навеса с сайта Best Vorota Group."};
+  var CALC_RU = {"nc.wa":"Здравствуйте! Расчёт навеса с сайта Best Vorota Group.", "nc.mgr":"Рассчитает менеджер", "nc.mgr2":"Для такой площади или формы цена считается индивидуально."};
+  /* ставка ₸/м² по городу, форме и площади; null - считает менеджер */
+  function rate(city, type, a){
+    if (city === "akt") {
+      if (type === "flat") return null;               /* хай-тек для Актобе клиент не назвал */
+      return a < 30 ? 30000 : (a <= 100 ? 25000 : null);
+    }
+    if (type === "flat") return a < 35 ? 60000 : (a <= 100 ? 55000 : null);
+    return a <= 80 ? 35000 : 30000;                    /* до 30 м² ставка не названа - берём 35 000 */
+  }
   var ROOF = {pc:{f:"#F0A23A", o:.62, s:"#C9771C"}, pl:{f:"#5B636C", o:1, s:"#3A4047"}, mt:{f:"#7A2E22", o:1, s:"#4E1B14"}};
   function on(sel){ var b = calc.querySelector(sel + " .is-on"); return b ? b.getAttribute("data-v") : ""; }
   function lbl(sel){ var b = calc.querySelector(sel + " .is-on"); return b ? b.textContent.trim() : ""; }
@@ -227,6 +237,20 @@ if (calc) (function(){
     document.getElementById("o-h").textContent = num(H);
     document.getElementById("o-area").textContent = num(W * L);
     document.getElementById("o-size").textContent = num(W) + " × " + num(L) + " " + mu;
+    /* ориентир цены */
+    var cityB = calc.querySelector(".cat-city .is-active"), city = cityB ? cityB.getAttribute("data-city") : "ast";
+    var area = Math.round(W * L * 100) / 100, r = rate(city, type, area), pv = document.getElementById("o-price");
+    var pk = pack(), dk = pk ? pk.dict : {}, TT = function(k){ return pick(k, dk) || CALC_RU[k] || ""; };
+    var priceTxt = "";
+    if (r) {
+      priceTxt = fmtPrice(Math.round(area * r)) + " ₸";
+      pv.textContent = fmtPrice(Math.round(area * r)); document.getElementById("o-cur").hidden = false;
+      document.getElementById("o-rate").textContent = fmtPrice(r) + " ₸/" + mu + "² × " + num(area) + " " + mu + "²";
+    } else {
+      pv.textContent = TT("nc.mgr"); document.getElementById("o-cur").hidden = true;
+      document.getElementById("o-rate").textContent = TT("nc.mgr2");
+    }
+    pv.parentNode.classList.toggle("is-mgr", !r);
     /* текст заявки */
     var p = pack(), d = p ? p.dict : {}, T = function(k){ return pick(k, d) || CALC_RU[k] || ""; };
     var cb = calc.querySelector(".cat-city .is-active");
@@ -237,7 +261,8 @@ if (calc) (function(){
       T("nc.size") + ": " + num(W) + " × " + num(L) + " " + mu + " (" + num(W * L) + " " + mu + "²), " + T("nc.h").toLowerCase() + " " + num(H) + " " + mu + "\n" +
       T("nc.roof") + ": " + lbl('[data-k="roof"]') + "\n" +
       T("nc.col") + ": " + lbl('[data-k="col"]') +
-      (extra.length ? "\n" + T("nc.ext") + ": " + extra.join(", ") : "");
+      (extra.length ? "\n" + T("nc.ext") + ": " + extra.join(", ") : "") +
+      (priceTxt ? "\n" + T("nc.pr") + ": " + priceTxt : "");
     var go = document.getElementById("calc-go");
     go.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
   }

@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@600;800&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/video/gate-auto-loop.webp">
-<link rel="stylesheet" href="styles.css?v=20260926-3">
+<link rel="stylesheet" href="styles.css?v=20260926-4">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"LocalBusiness","@id":"https://songokura.github.io/BestVorotaGroup/#astana","name":"Best Vorota Group - Астана","description":"Изготовление и установка ворот, навесов, заборов, перил и металлоконструкций под ключ в Астане. Откатные, распашные, кованые и автоматические ворота, навесы хай-тек.","url":"https://songokura.github.io/BestVorotaGroup/","telephone":"+77019980007","email":"Nurlybek.vorota@gmail.com","image":"https://songokura.github.io/BestVorotaGroup/assets/og-image.jpg","priceRange":"₸₸","foundingDate":"2017","address":{"@type":"PostalAddress","streetAddress":"ул. Акжол, 33","addressLocality":"Астана","addressCountry":"KZ"},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"19:00"},"sameAs":["https://www.instagram.com/best_vorota_astana/"],"areaServed":{"@type":"City","name":"Астана"}},
@@ -280,7 +280,12 @@
           <div><dt data-i="nc.area">Площадь</dt><dd><output id="o-area">24</output> м²</dd></div>
           <div><dt data-i="nc.size">Размер</dt><dd><output id="o-size">4 × 6 м</output></dd></div>
         </dl>
-        <p class="cv-note" data-i="nc.note">Цена зависит от города, металла и кровли - точный расчёт менеджер пришлёт в WhatsApp. Замер бесплатно.</p>
+        <div class="cv-price">
+          <p class="cv-pl" data-i="nc.pr">Ориентировочная стоимость</p>
+          <p class="cv-pv"><output id="o-price">840 000</output> <span id="o-cur">₸</span></p>
+          <p class="cv-rate" id="o-rate"></p>
+        </div>
+        <p class="cv-note" data-i="nc.note">Ориентир по ставке за м² для вашего города. Опции и точную сумму менеджер уточнит и пришлёт в WhatsApp. Замер бесплатно.</p>
         <a class="btn btn-wa cv-go" id="calc-go" href="https://wa.me/77009517425" target="_blank" rel="noopener"><svg width="18" height="18"><use href="#ic-wa"/></svg><span data-i="nc.go">Получить расчёт в WhatsApp</span></a>
       </div>
     </div>
@@ -758,6 +763,6 @@
   <video id="modalV" controls playsinline preload="none"></video>
 </div>
 
-<script src="script.js?v=20260926-3" defer></script>
+<script src="script.js?v=20260926-4" defer></script>
 </body>
 </html>

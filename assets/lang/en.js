@@ -21,6 +21,10 @@ window.SITE_EN = {
   tick: ["Sliding gates","Swing gates","Automatic gates","Wrought iron gates","Canopies","Hi-tech canopies","Fences","Railings","Awnings","Steel structures","Astana","Aktobe"],
   form: {hello:"Hello! Site survey request from the Best Vorota Group website.", name:"Name", city:"City", what:"What is needed", phone:"Phone", msg:"Comment", none:"not selected"},
   dict: {
+    "nc.pr": "Estimated price",
+    "nc.mgr": "Priced by the manager",
+    "nc.mgr2": "For this area or shape the price is calculated individually.",
+    "nc.note": "Estimate based on the per-m² rate for your city. The manager will confirm options and the exact total in WhatsApp. Survey is free.",
     "a.calc": "Canopy calculator",
     "nc.k": "Canopy calculator",
     "nc.t": "Build your canopy - we will send the quote to WhatsApp",
@@ -53,7 +57,6 @@ window.SITE_EN = {
     "nc.e4": "Lighting",
     "nc.area": "Area",
     "nc.size": "Size",
-    "nc.note": "The price depends on the city, metal and roofing - the manager will send an exact quote to WhatsApp. Survey is free.",
     "nc.go": "Get a quote in WhatsApp",
     "nc.wa": "Hello! Canopy quote from the Best Vorota Group website.",
     "nw.t": "Our canopies",

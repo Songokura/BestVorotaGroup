@@ -358,6 +358,13 @@ html.no-plate .pp .leaf{height:62svh;min-height:360px}
 .cv-sum div{padding:14px 16px;border-radius:8px;background:var(--card);border:1px solid var(--line)}
 .cv-sum dt{font:600 11px/1 var(--ft);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .cv-sum dd{margin:8px 0 0;font:800 26px/1 var(--fd);color:#fff}
+.cv-price{padding:18px 20px;border-radius:8px;background:linear-gradient(135deg,rgba(255,106,0,.16),rgba(255,106,0,.04));border:1px solid rgba(255,138,42,.45)}
+.cv-pl{font:600 11px/1 var(--ft);letter-spacing:.14em;text-transform:uppercase;color:var(--hot);margin:0}
+.cv-pv{margin:10px 0 0;font:800 40px/1 var(--fd);color:#fff}
+.cv-pv.is-mgr{font-size:24px;line-height:1.15}
+.cv-pv span{font-size:.7em;color:var(--or2)}
+.cv-rate{margin:8px 0 0;font-size:13px;color:var(--mute)}
+.cv-rate:empty{display:none}
 .cv-note{font-size:14px;color:var(--mute);margin:0}
 .cv-go{align-self:stretch}
 /* лента работ: фото без подписей */
