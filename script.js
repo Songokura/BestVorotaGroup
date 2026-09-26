@@ -197,6 +197,43 @@ if (calc) (function(){
     zs.slice().reverse().forEach(function(z){
       xs.forEach(function(x){ var a = P(x, 0, z), b = P(x, postY(x), z); el("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], stroke:col, "stroke-width":sw * 1.5, "stroke-linecap":"round", opacity: z === 0 ? 1 : .8}); });
     });
+    /* ковка: кованые кронштейны в углах «столб - балка» по периметру,
+       у арочного и двускатного ещё пара завитков во фронтоне. Рисуется до кровли -
+       дальние кронштейны уходят под неё, а не лежат поверх */
+    function beamY(x){ return postY(0) + (postY(1) - postY(0)) * x / W; }
+    var GOLD = {fill:"none", stroke:"#C99A3E", "stroke-width":Math.max(1.3, sw * .55), "stroke-linecap":"round"};
+    function bracket(x0, z0, dx, dz, op){
+      var b = Math.min(.6, W * .14, L * .2), y0 = dx ? beamY(x0) : postY(x0 ? 1 : 0);
+      var yb = dx ? beamY(x0 + dx * b) : y0;
+      var A = P(x0, y0 - b, z0), B = P(x0 + dx * b, yb, z0 + dz * b);
+      var C1 = P(x0, y0 - b * .45, z0), C2 = P(x0 + dx * b * .55, yb, z0 + dz * b * .55);
+      var g = el("g", {opacity:op});
+      el("path", Object.assign({d:"M" + A + "C" + C1 + " " + C2 + " " + B}, GOLD), g);
+      el("line", Object.assign({x1:A[0], y1:A[1], x2:B[0], y2:B[1]}, GOLD), g);
+      var M = P(x0 + dx * b * .3, (y0 + yb) / 2 - b * .2, z0 + dz * b * .3);
+      el("circle", Object.assign({cx:M[0], cy:M[1], r:Math.max(2.2, s * b * .13)}, GOLD), g);
+    }
+    if (ex.kov) {
+      zs.forEach(function(z, zi){
+        var op = zi ? .75 : 1;
+        xs.forEach(function(x){
+          if (zi === 0) bracket(x, 0, x ? -1 : 1, 0, 1);
+          if (z < L) bracket(x, z, 0, 1, op);
+          if (z > 0) bracket(x, z, 0, -1, op * .8);
+        });
+      });
+      if (type === "arch" || type === "gable") {
+        var gh = maxY - H, cx = W / 2;
+        [-1, 1].forEach(function(sg){
+          var p0 = P(cx, H + gh * .06, 0), p1 = P(cx + sg * W * .08, H + gh * .06, 0), p2 = P(cx + sg * W * .16, H + gh * .3, 0), p3 = P(cx + sg * W * .1, H + gh * .45, 0);
+          el("path", Object.assign({d:"M" + p0 + "C" + p1 + " " + p2 + " " + p3}, GOLD));
+          var e = P(cx + sg * W * .1, H + gh * .45, 0);
+          el("circle", Object.assign({cx:e[0] - sg * 2, cy:e[1] + 2, r:Math.max(2.4, s * gh * .07)}, GOLD));
+          var q0 = P(cx + sg * W * .2, H + gh * .06, 0), q1 = P(cx + sg * W * .3, H + gh * .06, 0), q2 = P(cx + sg * W * .3, H + gh * .28, 0), q3 = P(cx + sg * W * .24, H + gh * .3, 0);
+          el("path", Object.assign({d:"M" + q0 + "C" + q1 + " " + q2 + " " + q3}, GOLD));
+        });
+      }
+    }
     /* кровля: полосы между соседними точками профиля по всей длине */
     for (i = top.length - 1; i > 0; i--) {
       var a = top[i - 1], b = top[i];
@@ -213,13 +250,6 @@ if (calc) (function(){
       el("polyline", Object.assign({points:pts(line), opacity: i ? .55 : 1}, frame));
       if (type !== "flat") el("line", {x1:P(0,postY(0),z)[0], y1:P(0,postY(0),z)[1], x2:P(W,postY(1),z)[0], y2:P(W,postY(1),z)[1], stroke:col, "stroke-width":sw * .7, opacity: i ? .45 : .9});
     }
-    /* ковка: завитки по передней ферме */
-    if (ex.kov && type !== "flat") {
-      for (i = 1; i < 6; i++) {
-        var t = i / 6, pt = top[Math.round(t * (top.length - 1))], c1 = P(pt[0], (pt[1] + postY(t > .5 ? 1 : 0)) / 2, 0), r = Math.max(4, s * .16);
-        el("path", {d:"M" + (c1[0] - r) + "," + c1[1] + "a" + r + "," + r + " 0 1,1 " + r + "," + r + "a" + (r / 2) + "," + (r / 2) + " 0 1,1 " + (r / 2) + ",-" + (r / 2), fill:"none", stroke:"#D9B35B", "stroke-width":1.6});
-      }
-    }
     /* водосток по нижней кромке и труба */
     if (ex.drain) {
       var gx = W, gy = top[top.length - 1][1];
@@ -227,9 +257,21 @@ if (calc) (function(){
       el("line", {x1:g1[0], y1:g1[1], x2:g2[0], y2:g2[1], stroke:"#2F3439", "stroke-width":sw * 1.3});
       el("line", {x1:g1[0] + 5, y1:g1[1], x2:g3[0] + 5, y2:g3[1], stroke:"#2F3439", "stroke-width":sw});
     }
-    /* подсветка: тёплые точки под передней балкой */
-    if (ex.light) for (i = 1; i < 6; i++) {
-      var lp = P(W * i / 6, H - .08, L * .15); el("circle", {cx:lp[0], cy:lp[1] + 3, r:3.2, fill:"#FFE6A8"}); el("circle", {cx:lp[0], cy:lp[1] + 3, r:9, fill:"#FFD27A", opacity:.35});
+    /* подсветка: светодиодная лента под балками и тёплое пятно света на площадке */
+    if (ex.light) {
+      var defs = el("defs", {}), rg = el("radialGradient", {id:"cv-glow"}, defs);
+      el("stop", {offset:"0", "stop-color":"#FFD98A", "stop-opacity":".75"}, rg);
+      el("stop", {offset:"1", "stop-color":"#FFD98A", "stop-opacity":"0"}, rg);
+      var gc = P(W / 2, 0, L / 2), gr = P(W, 0, L / 2), gt = P(W / 2, 0, L);
+      svg.insertBefore(defs, svg.firstChild);
+      var glow = el("ellipse", {cx:gc[0], cy:gc[1], rx:Math.abs(gr[0] - gc[0]) * 1.1 + 20, ry:Math.abs(gt[1] - gc[1]) + 14, fill:"url(#cv-glow)"});
+      svg.insertBefore(glow, svg.childNodes[3] || null);
+      var runs = [[P(0, beamY(0) - .05, 0), P(W, beamY(W) - .05, 0)], [P(W, postY(1) - .05, 0), P(W, postY(1) - .05, L)]];
+      runs.forEach(function(r, ri){
+        var op = ri ? .7 : 1;
+        el("line", {x1:r[0][0], y1:r[0][1], x2:r[1][0], y2:r[1][1], stroke:"#FFC766", "stroke-width":9, "stroke-linecap":"round", opacity:.28 * op});
+        el("line", {x1:r[0][0], y1:r[0][1], x2:r[1][0], y2:r[1][1], stroke:"#FFF1C9", "stroke-width":2.2, "stroke-linecap":"round", opacity:op});
+      });
     }
     /* размеры */
     var m = document.querySelector('[data-i="nc.m"]'), mu = m ? m.textContent : "м";
