@@ -27,6 +27,7 @@ document.addEventListener("click", function(e){
   var h = a.getAttribute("href") || "";
   if (h.indexOf("tel:") === 0) conv("phone");
   else if (h.indexOf("wa.me") > -1) conv("contact");
+  else if (h.indexOf("mailto:") === 0) conv("contact");
 }, true);
 
 /* ---------------- СЛОВАРИ ----------------
